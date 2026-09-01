@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GradleBoard - a Gradle-powered DevOps build dashboard demo project">
+    <title>GradleBoard | DevOps Build Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
+    <script defer th:src="@{/js/app.js}" src="/js/app.js"></script>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" href="/" aria-label="GradleBoard home">
+            <span class="brand-logo">G</span>
+            <span class="brand-copy">
+                <strong>GradleBoard</strong>
+                <small>Build Control Center</small>
+            </span>
+        </a>
+
+        <nav class="side-nav" aria-label="Primary navigation">
+            <a class="nav-link active" href="#overview"><span class="nav-icon">01</span><span>Overview</span></a>
+            <a class="nav-link" href="#pipeline"><span class="nav-icon">02</span><span>Pipeline</span></a>
+            <a class="nav-link" href="#history"><span class="nav-icon">03</span><span>Build History</span></a>
+            <a class="nav-link" href="/api/builds"><span class="nav-icon">API</span><span>Build API</span></a>
+        </nav>
+
+        <div class="sidebar-card">
+            <div class="sidebar-card-top">
+                <span class="live-dot"></span>
+                <span>Gradle Lab</span>
+            </div>
+            <strong>Build. Test. Ship.</strong>
+            <p>A complete Java project for demonstrating the Gradle lifecycle.</p>
+            <code>./gradlew build</code>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar" id="overview">
+            <div>
+                <div class="breadcrumb">DEVOPS SHACK / GRADLE LAB</div>
+                <h1>Build Operations</h1>
+                <p>Monitor application builds and explore what Gradle does behind the scenes.</p>
+            </div>
+            <div class="top-actions">
+                <div class="runtime-pill"><span class="live-dot"></span> Application online</div>
+                <a class="primary-link" href="#new-build">+ New build</a>
+            </div>
+        </header>
+
+        <div class="toast" th:if="${message}" th:classappend="${messageStatus}" role="status">
+            <span th:text="${message}">Build completed</span>
+        </div>
+
+        <section class="metrics-grid" aria-label="Build metrics">
+            <article class="metric-card">
+                <div class="metric-head"><span>Total builds</span><span class="metric-icon blue">↗</span></div>
+                <div class="metric-value" th:text="${summary.total}">8</div>
+                <div class="metric-foot"><strong>All executions</strong><span>in current session</span></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head"><span>Success rate</span><span class="metric-icon green">✓</span></div>
+                <div class="metric-value"><span th:text="${summary.successRate}">75</span><small>%</small></div>
+                <div class="progress-track"><span th:style="'width:' + ${summary.successRate} + '%'" style="width:75%"></span></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head"><span>Failed</span><span class="metric-icon amber">!</span></div>
+                <div class="metric-value" th:text="${summary.failed}">2</div>
+                <div class="metric-foot"><strong>Needs review</strong><span>pipeline failures</span></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head"><span>Avg. duration</span><span class="metric-icon violet">⌁</span></div>
+                <div class="metric-value"><span th:text="${summary.averageDurationSeconds}">39</span><small>s</small></div>
+                <div class="metric-foot"><strong>Build speed</strong><span>average runtime</span></div>
+            </article>
+        </section>
+
+        <section class="content-grid" id="pipeline">
+            <article class="panel pipeline-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">GRADLE LIFECYCLE</span>
+                        <h2>Build Pipeline</h2>
+                    </div>
+                    <span class="status-badge healthy">Healthy</span>
+                </div>
+
+                <div class="pipeline-flow">
+                    <div class="pipeline-step done">
+                        <span class="step-number">01</span>
+                        <div><strong>Compile</strong><small>compileJava</small></div>
+                    </div>
+                    <span class="connector"></span>
+                    <div class="pipeline-step done">
+                        <span class="step-number">02</span>
+                        <div><strong>Test</strong><small>test</small></div>
+                    </div>
+                    <span class="connector"></span>
+                    <div class="pipeline-step done">
+                        <span class="step-number">03</span>
+                        <div><strong>Verify</strong><small>check</small></div>
+                    </div>
+                    <span class="connector"></span>
+                    <div class="pipeline-step active">
+                        <span class="step-number">04</span>
+                        <div><strong>Package</strong><small>bootJar</small></div>
+                    </div>
+                </div>
+
+                <div class="build-command">
+                    <div>
+                        <span>Production artifact</span>
+                        <strong>build/libs/gradleboard.jar</strong>
+                    </div>
+                    <code>./gradlew clean build</code>
+                </div>
+            </article>
+
+            <article class="panel trigger-panel" id="new-build">
+                <div class="panel-header">
+                    <div>
+                        <span class="section-kicker">SIMULATION</span>
+                        <h2>Trigger Build</h2>
+                    </div>
+                    <span class="endpoint-chip">POST /builds</span>
+                </div>
+
+                <form action="/builds" method="post" class="build-form">
+                    <label>
+                        <span>Service name</span>
+                        <input type="text" name="serviceName" placeholder="orders-api" required maxlength="40">
+                    </label>
+                    <label>
+                        <span>Git branch</span>
+                        <input type="text" name="branch" value="main" placeholder="main" maxlength="60">
+                    </label>
+                    <label>
+                        <span>Environment</span>
+                        <select name="environment">
+                            <option>DEV</option>
+                            <option>QA</option>
+                            <option>PPD</option>
+                            <option>PROD</option>
+                        </select>
+                    </label>
+                    <button type="submit">Run simulated build <span>→</span></button>
+                </form>
+            </article>
+        </section>
+
+        <section class="panel history-panel" id="history">
+            <div class="panel-header history-heading">
+                <div>
+                    <span class="section-kicker">RECENT EXECUTIONS</span>
+                    <h2>Build History</h2>
+                </div>
+                <div class="table-tools">
+                    <label class="search-box">
+                        <span>⌕</span>
+                        <input id="buildSearch" type="search" placeholder="Search service or branch...">
+                    </label>
+                    <select id="statusFilter" aria-label="Filter by status">
+                        <option value="all">All statuses</option>
+                        <option value="success">Success</option>
+                        <option value="failed">Failed</option>
+                        <option value="running">Running</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table id="buildTable">
+                    <thead>
+                    <tr>
+                        <th>Build</th>
+                        <th>Service</th>
+                        <th>Branch</th>
+                        <th>Environment</th>
+                        <th>Commit</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                        <th>Started</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="build : ${builds}" th:attr="data-status=${#strings.toLowerCase(build.status.toString())}">
+                        <td><strong class="build-number" th:text="'#' + ${build.id}">#2418</strong></td>
+                        <td><div class="service-cell"><span class="service-avatar" th:text="${#strings.toUpperCase(#strings.substring(build.serviceName,0,1))}">P</span><strong th:text="${build.serviceName}">payment-api</strong></div></td>
+                        <td><span class="branch-chip" th:text="${build.branch}">main</span></td>
+                        <td><span class="env-chip" th:classappend="${#strings.toLowerCase(build.environment)}" th:text="${build.environment}">PROD</span></td>
+                        <td><code class="commit" th:text="${build.commitId}">7cd8a91</code></td>
+                        <td><span class="build-status" th:classappend="${#strings.toLowerCase(build.status.toString())}" th:text="${build.status}">SUCCESS</span></td>
+                        <td th:text="${build.durationSeconds} + 's'">46s</td>
+                        <td class="time-cell" th:text="${#temporals.format(build.createdAt, 'dd MMM, HH:mm')}">01 Sep, 10:22</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" hidden>No builds match your filters.</div>
+            </div>
+        </section>
+
+        <section class="tech-strip">
+            <div><span>Build Tool</span><strong>Gradle 9.7.1</strong></div>
+            <div><span>Framework</span><strong>Spring Boot 4.1.1</strong></div>
+            <div><span>Language</span><strong>Java 21</strong></div>
+            <div><span>Template Engine</span><strong>Thymeleaf</strong></div>
+            <div><span>Artifact</span><strong>Executable JAR</strong></div>
+        </section>
+
+        <footer>
+            <span>GradleBoard v1.0.0</span>
+            <span>DevOps Shack • Gradle Complete Tutorial Project</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

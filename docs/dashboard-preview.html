@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="GradleBoard - a Gradle-powered DevOps build dashboard demo project" name="description"/>
+<title>GradleBoard | DevOps Build Dashboard</title>
+<link href="../src/main/resources/static/css/styles.css" rel="stylesheet"/>
+<script defer="" src="../src/main/resources/static/js/app.js"></script>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<a aria-label="GradleBoard home" class="brand" href="/">
+<span class="brand-logo">G</span>
+<span class="brand-copy">
+<strong>GradleBoard</strong>
+<small>Build Control Center</small>
+</span>
+</a>
+<nav aria-label="Primary navigation" class="side-nav">
+<a class="nav-link active" href="#overview"><span class="nav-icon">01</span><span>Overview</span></a>
+<a class="nav-link" href="#pipeline"><span class="nav-icon">02</span><span>Pipeline</span></a>
+<a class="nav-link" href="#history"><span class="nav-icon">03</span><span>Build History</span></a>
+<a class="nav-link" href="/api/builds"><span class="nav-icon">API</span><span>Build API</span></a>
+</nav>
+<div class="sidebar-card">
+<div class="sidebar-card-top">
+<span class="live-dot"></span>
+<span>Gradle Lab</span>
+</div>
+<strong>Build. Test. Ship.</strong>
+<p>A complete Java project for demonstrating the Gradle lifecycle.</p>
+<code>./gradlew build</code>
+</div>
+</aside>
+<main class="main-content">
+<header class="topbar" id="overview">
+<div>
+<div class="breadcrumb">DEVOPS SHACK / GRADLE LAB</div>
+<h1>Build Operations</h1>
+<p>Monitor application builds and explore what Gradle does behind the scenes.</p>
+</div>
+<div class="top-actions">
+<div class="runtime-pill"><span class="live-dot"></span> Application online</div>
+<a class="primary-link" href="#new-build">+ New build</a>
+</div>
+</header>
+
+<section aria-label="Build metrics" class="metrics-grid">
+<article class="metric-card">
+<div class="metric-head"><span>Total builds</span><span class="metric-icon blue">↗</span></div>
+<div class="metric-value">8</div>
+<div class="metric-foot"><strong>All executions</strong><span>in current session</span></div>
+</article>
+<article class="metric-card">
+<div class="metric-head"><span>Success rate</span><span class="metric-icon green">✓</span></div>
+<div class="metric-value"><span>75</span><small>%</small></div>
+<div class="progress-track"><span style="width:75%"></span></div>
+</article>
+<article class="metric-card">
+<div class="metric-head"><span>Failed</span><span class="metric-icon amber">!</span></div>
+<div class="metric-value">2</div>
+<div class="metric-foot"><strong>Needs review</strong><span>pipeline failures</span></div>
+</article>
+<article class="metric-card">
+<div class="metric-head"><span>Avg. duration</span><span class="metric-icon violet">⌁</span></div>
+<div class="metric-value"><span>39</span><small>s</small></div>
+<div class="metric-foot"><strong>Build speed</strong><span>average runtime</span></div>
+</article>
+</section>
+<section class="content-grid" id="pipeline">
+<article class="panel pipeline-panel">
+<div class="panel-header">
+<div>
+<span class="section-kicker">GRADLE LIFECYCLE</span>
+<h2>Build Pipeline</h2>
+</div>
+<span class="status-badge healthy">Healthy</span>
+</div>
+<div class="pipeline-flow">
+<div class="pipeline-step done">
+<span class="step-number">01</span>
+<div><strong>Compile</strong><small>compileJava</small></div>
+</div>
+<span class="connector"></span>
+<div class="pipeline-step done">
+<span class="step-number">02</span>
+<div><strong>Test</strong><small>test</small></div>
+</div>
+<span class="connector"></span>
+<div class="pipeline-step done">
+<span class="step-number">03</span>
+<div><strong>Verify</strong><small>check</small></div>
+</div>
+<span class="connector"></span>
+<div class="pipeline-step active">
+<span class="step-number">04</span>
+<div><strong>Package</strong><small>bootJar</small></div>
+</div>
+</div>
+<div class="build-command">
+<div>
+<span>Production artifact</span>
+<strong>build/libs/gradleboard.jar</strong>
+</div>
+<code>./gradlew clean build</code>
+</div>
+</article>
+<article class="panel trigger-panel" id="new-build">
+<div class="panel-header">
+<div>
+<span class="section-kicker">SIMULATION</span>
+<h2>Trigger Build</h2>
+</div>
+<span class="endpoint-chip">POST /builds</span>
+</div>
+<form action="/builds" class="build-form" method="post">
+<label>
+<span>Service name</span>
+<input maxlength="40" name="serviceName" placeholder="orders-api" required="" type="text"/>
+</label>
+<label>
+<span>Git branch</span>
+<input maxlength="60" name="branch" placeholder="main" type="text" value="main"/>
+</label>
+<label>
+<span>Environment</span>
+<select name="environment">
+<option>DEV</option>
+<option>QA</option>
+<option>PPD</option>
+<option>PROD</option>
+</select>
+</label>
+<button type="submit">Run simulated build <span>→</span></button>
+</form>
+</article>
+</section>
+<section class="panel history-panel" id="history">
+<div class="panel-header history-heading">
+<div>
+<span class="section-kicker">RECENT EXECUTIONS</span>
+<h2>Build History</h2>
+</div>
+<div class="table-tools">
+<label class="search-box">
+<span>⌕</span>
+<input id="buildSearch" placeholder="Search service or branch..." type="search"/>
+</label>
+<select aria-label="Filter by status" id="statusFilter">
+<option value="all">All statuses</option>
+<option value="success">Success</option>
+<option value="failed">Failed</option>
+<option value="running">Running</option>
+</select>
+</div>
+</div>
+<div class="table-scroll">
+<table id="buildTable">
+<thead>
+<tr>
+<th>Build</th>
+<th>Service</th>
+<th>Branch</th>
+<th>Environment</th>
+<th>Commit</th>
+<th>Status</th>
+<th>Duration</th>
+<th>Started</th>
+</tr>
+</thead>
+<tbody><tr data-status="success">
+<td><strong class="build-number">#2418</strong></td>
+<td><div class="service-cell"><span class="service-avatar">P</span><strong>payment-api</strong></div></td>
+<td><span class="branch-chip">main</span></td>
+<td><span class="env-chip prod">PROD</span></td>
+<td><code class="commit">7cd8a91</code></td>
+<td><span class="build-status success">SUCCESS</span></td>
+<td>46s</td><td class="time-cell">01 Sep, 10:22</td></tr><tr data-status="success">
+<td><strong class="build-number">#2417</strong></td>
+<td><div class="service-cell"><span class="service-avatar">W</span><strong>web-frontend</strong></div></td>
+<td><span class="branch-chip">feature/navbar</span></td>
+<td><span class="env-chip dev">DEV</span></td>
+<td><code class="commit">b81a209</code></td>
+<td><span class="build-status success">SUCCESS</span></td>
+<td>38s</td><td class="time-cell">01 Sep, 10:11</td></tr><tr data-status="failed">
+<td><strong class="build-number">#2416</strong></td>
+<td><div class="service-cell"><span class="service-avatar">A</span><strong>auth-service</strong></div></td>
+<td><span class="branch-chip">main</span></td>
+<td><span class="env-chip qa">QA</span></td>
+<td><code class="commit">91e4bc3</code></td>
+<td><span class="build-status failed">FAILED</span></td>
+<td>31s</td><td class="time-cell">01 Sep, 09:56</td></tr><tr data-status="success">
+<td><strong class="build-number">#2415</strong></td>
+<td><div class="service-cell"><span class="service-avatar">O</span><strong>orders-api</strong></div></td>
+<td><span class="branch-chip">release/3.2</span></td>
+<td><span class="env-chip ppd">PPD</span></td>
+<td><code class="commit">e672bc1</code></td>
+<td><span class="build-status success">SUCCESS</span></td>
+<td>51s</td><td class="time-cell">01 Sep, 09:30</td></tr><tr data-status="running">
+<td><strong class="build-number">#2414</strong></td>
+<td><div class="service-cell"><span class="service-avatar">N</span><strong>notification-worker</strong></div></td>
+<td><span class="branch-chip">main</span></td>
+<td><span class="env-chip dev">DEV</span></td>
+<td><code class="commit">1f42a6c</code></td>
+<td><span class="build-status running">RUNNING</span></td>
+<td>18s</td><td class="time-cell">01 Sep, 09:12</td></tr><tr data-status="success">
+<td><strong class="build-number">#2413</strong></td>
+<td><div class="service-cell"><span class="service-avatar">I</span><strong>inventory-api</strong></div></td>
+<td><span class="branch-chip">develop</span></td>
+<td><span class="env-chip qa">QA</span></td>
+<td><code class="commit">ff0d513</code></td>
+<td><span class="build-status success">SUCCESS</span></td>
+<td>42s</td><td class="time-cell">01 Sep, 08:28</td></tr></tbody>
+</table>
+<div class="empty-state" hidden="" id="emptyState">No builds match your filters.</div>
+</div>
+</section>
+<section class="tech-strip">
+<div><span>Build Tool</span><strong>Gradle 9.7.1</strong></div>
+<div><span>Framework</span><strong>Spring Boot 4.1.1</strong></div>
+<div><span>Language</span><strong>Java 21</strong></div>
+<div><span>Template Engine</span><strong>Thymeleaf</strong></div>
+<div><span>Artifact</span><strong>Executable JAR</strong></div>
+</section>
+<footer>
+<span>GradleBoard v1.0.0</span>
+<span>DevOps Shack • Gradle Complete Tutorial Project</span>
+</footer>
+</main>
+</div>
+</body>
+</html>

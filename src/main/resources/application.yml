@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: gradle-devops-dashboard
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8080
